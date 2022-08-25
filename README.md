@@ -11,5 +11,5 @@ Salesforce recon and exploitation tool*
 # TODO help command
 ```
 
-Awesome name by @
+Awesome name by @zeroc00I
 
