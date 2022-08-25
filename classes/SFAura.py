@@ -1,10 +1,5 @@
 import re
-import requests
 import json
-
-# Ignore requests lib SSL warnings
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 from helpers.constants import USER_AGENT, AURA_ENDPOINTS
 from helpers.downloader import make_post_request

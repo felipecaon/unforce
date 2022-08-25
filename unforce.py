@@ -11,7 +11,7 @@ def menu():
     globals().update(locals())
 
 def exploit():
-    url = SFAura("https://channel.latch.com/")
+    url = SFAura("salesforce-lightining-application")
 
     is_salesforce = url.is_salesforce_aura()
 
@@ -21,7 +21,7 @@ def exploit():
     url.retrive_fwuid()
 
     config_data = url.get_config_data()
-    
+
     print(url.get_objects(config_data))
     print(url.get_csp_trusted_urls(config_data))
 
