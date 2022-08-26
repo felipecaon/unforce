@@ -6,10 +6,10 @@ import re
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-from helpers.utils import remove_http_schema, format_url_to_snake_case, save_data_in_file
-from helpers.constants import BASE_FOLDER_NAME, REQUESTS_FOLDER_NAME, RESPONSE_FOLDER_NAME
+from helpers.utils import remove_http_schema, format_url_to_snake_case, save_data
+from helpers.constants import REQUESTS_FOLDER_NAME
 
-def make_post_request(url: str, path: str, headers: object, data: [object, str] = "", save_as: str = ""):
+def make_post_request(url: str, path: str, headers: object, data: [object, str] = "", save_as: str = "", path_to_save: str = ""):
     """
     Wrapper around request.post
     @param: same as requests
@@ -23,7 +23,8 @@ def make_post_request(url: str, path: str, headers: object, data: [object, str] 
             path=path,
             headers=headers,
             data=data,
-            save_as=save_as
+            save_as=save_as,
+            path_to_save=path_to_save
         )
     print("pasou")
     return requests.post(
@@ -33,7 +34,7 @@ def make_post_request(url: str, path: str, headers: object, data: [object, str] 
         verify=False
     )
 
-def save_request_burp_format(url: str, path: str, headers: object, data: [object, str], save_as: str = ""):
+def save_request_burp_format(url: str, path: str, headers: object, data: [object, str], save_as: str = "", path_to_save: str = ""):
     """
     Create burp-like request and saved to text file
     @param: same as requests
@@ -44,8 +45,7 @@ Host: {remove_http_schema(url)}
 {transform_headers_to_list(headers)}
 {data.replace(" ", "")}
 """
-    path_to_save=f'{format_url_to_snake_case(url)}_{BASE_FOLDER_NAME}/{REQUESTS_FOLDER_NAME}'
-    save_data_in_file(path=path_to_save, filename=save_as, data=request)
+    save_data(path=f'{path_to_save}/{REQUESTS_FOLDER_NAME}', filename=save_as, data=request)
 
 def transform_headers_to_list(headers: dict) -> str:
     """

@@ -1,8 +1,9 @@
 import re
 import json
 
-from helpers.constants import USER_AGENT, AURA_ENDPOINTS
+from helpers.constants import USER_AGENT, AURA_ENDPOINTS, BASE_FOLDER_NAME
 from helpers.downloader import make_post_request
+from helpers.utils import save_data, format_url_to_snake_case, save_response
 
 class SFAura:
     def __init__(self, url):
@@ -13,6 +14,7 @@ class SFAura:
         self.context = ""
         self.token = "unforcerocks"
 
+        self.folder = f'{format_url_to_snake_case(url)}_{BASE_FOLDER_NAME}'
         self.header = {'User-Agent':f'{USER_AGENT}', 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'}
 
     def is_salesforce_aura(self) -> bool:
@@ -60,26 +62,28 @@ class SFAura:
         """
         message = json.dumps({"actions":[{"id":"123;a","descriptor":"serviceComponent://ui.force.components.controllers.hostConfig.HostConfigController/ACTION$getConfigData","callingDescriptor":"UNKNOWN","params":{}}]})
         post_data = f'message={message}&aura.context={self.context}&aura.token={self.token}'
-        return make_post_request(url=self.url, path=self.path, headers=self.header, data=post_data, save_as="get_config_data").json()
+        return make_post_request(url=self.url, path=self.path, headers=self.header, data=post_data, save_as="get_config_data", path_to_save=self.folder).json()
 
-    @staticmethod
-    def get_objects(json: object) -> list:
+    def get_objects(self, json: object) -> list:
         """
         Returns objects from config data
         @param: json object
         @return: list of objects
         """
-        return list(json['actions'][0]['returnValue']['apiNamesToKeyPrefixes'].keys())
+        objects = list(json['actions'][0]['returnValue']['apiNamesToKeyPrefixes'].keys())
+        for obj in objects:
+            save_data(path=self.folder, filename="objects", data=obj + '\n')
+        return objects
 
-    @staticmethod
-    def get_csp_trusted_urls(json: object) -> list:
+    def get_csp_trusted_urls(self, json: object) -> list:
         """
         Returns csp trusted sites from config data
         @param: json object
         @return: list of trusted sites
         """
-        return json['actions'][0]['returnValue']['cspTrustedSites']
-
+        sites = json['actions'][0]['returnValue']['cspTrustedSites']
+        for site in sites:
+            save_data(path=self.folder, filename="csp_sites", data=site + '\n')
 
     def get_objects_items(self, items: list):
         """
@@ -89,7 +93,8 @@ class SFAura:
         for item in items:
             message = self.build_object_item_message(item)
             post_data = f'message={message}&aura.context={self.context}&aura.token={self.token}'
-            make_post_request(url=self.url, path=self.path, headers=self.header, data=post_data, save_as=f'{item}_object').json()
+            response = make_post_request(url=self.url, path=self.path, headers=self.header, data=post_data, save_as=f'{item}_object', path_to_save=self.folder).json()
+            save_response(path=self.folder, filename=f'{item}_object', data=str(response))
 
     @staticmethod
     def build_object_item_message(item: str) -> object:
