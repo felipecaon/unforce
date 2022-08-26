@@ -42,7 +42,7 @@ example_com_results/
 To avoid adittional calls Unforce has a cache control system where the fwuid discovered for a salesforce instance is stored.
 If the user uses the same URL, the cached fwuid will be used.
 
-Cache is stored inside `.cache` file.
+Cache is stored in a `.unforce` file inside every results folder.
 
 # Examples
 

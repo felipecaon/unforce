@@ -19,10 +19,11 @@ def format_url_to_snake_case(url: str) -> str:
     """
     return remove_http_schema(url).replace(".", "_")
 
-def create_folder_structure(target: str):
+def create_folder_structure(target: str) -> str:
     """
     Created folder structure for requests and responses
     @param: target str
+    @return: base folder str
     """
 
     snake_case_target = format_url_to_snake_case(target)
@@ -32,6 +33,8 @@ def create_folder_structure(target: str):
         os.mkdir(target_folder_name)
         os.mkdir(f'{target_folder_name}/{REQUESTS_FOLDER_NAME}')
         os.mkdir(f'{target_folder_name}/{RESPONSE_FOLDER_NAME}')
+
+    return target_folder_name
 
 def save_data(filename: str, path: str, data: any):
     """

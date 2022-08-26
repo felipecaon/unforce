@@ -26,7 +26,7 @@ def make_post_request(url: str, path: str, headers: object, data: [object, str] 
             save_as=save_as,
             path_to_save=path_to_save
         )
-    print("pasou")
+        
     return requests.post(
         url=f'{url}{path}', 
         headers=headers, 

@@ -4,11 +4,12 @@ import json
 from helpers.constants import USER_AGENT, AURA_ENDPOINTS, BASE_FOLDER_NAME
 from helpers.downloader import make_post_request
 from helpers.utils import save_data, format_url_to_snake_case, save_response
+from helpers.cache import save_cache
 
 class SFAura:
     def __init__(self, url):
         self.url = url
-        self.path = ""
+        self.endpoint = ""
         self.context = ""
         self.fwuid = ""
         self.context = ""
@@ -28,10 +29,10 @@ class SFAura:
             response = make_post_request(url=self.url, path=endpoint, headers=self.header)
 
             if 'aura:invalidSession' in response.text:
-                self.path = endpoint
+                self.endpoint = endpoint
                 break
             
-        return bool(self.path)
+        return bool(self.endpoint)
 
     @staticmethod
     def build_context(fwuid: str) -> object:
@@ -49,11 +50,13 @@ class SFAura:
         message = {}
         context = self.build_context("givemefwuid")
         post_data = f'message={message}&aura.context={context}&aura.token={self.token}'
-        response = make_post_request(url=self.url, path=self.path, headers=self.header, data=post_data)
+        response = make_post_request(url=self.url, path=self.endpoint, headers=self.header, data=post_data)
 
         fwuid_pattern = "Expected:(.*?) Actual"
         self.fwuid = re.search(fwuid_pattern, response.text).group(1).strip()
         self.context = self.build_context(self.fwuid)
+    
+        save_cache(path=self.folder, url=self.url, fwuid=self.fwuid, endpoint=self.endpoint)
 
     def get_config_data(self) -> object:
         """
@@ -62,7 +65,7 @@ class SFAura:
         """
         message = json.dumps({"actions":[{"id":"123;a","descriptor":"serviceComponent://ui.force.components.controllers.hostConfig.HostConfigController/ACTION$getConfigData","callingDescriptor":"UNKNOWN","params":{}}]})
         post_data = f'message={message}&aura.context={self.context}&aura.token={self.token}'
-        return make_post_request(url=self.url, path=self.path, headers=self.header, data=post_data, save_as="get_config_data", path_to_save=self.folder).json()
+        return make_post_request(url=self.url, path=self.endpoint, headers=self.header, data=post_data, save_as="get_config_data", path_to_save=self.folder).json()
 
     def get_objects(self, json: object) -> list:
         """
@@ -93,7 +96,7 @@ class SFAura:
         for item in items:
             message = self.build_object_item_message(item)
             post_data = f'message={message}&aura.context={self.context}&aura.token={self.token}'
-            response = make_post_request(url=self.url, path=self.path, headers=self.header, data=post_data, save_as=f'{item}_object', path_to_save=self.folder).json()
+            response = make_post_request(url=self.url, path=self.endpoint, headers=self.header, data=post_data, save_as=f'{item}_object', path_to_save=self.folder).json()
             save_response(path=self.folder, filename=f'{item}_object', data=str(response))
 
     @staticmethod
@@ -113,5 +116,14 @@ class SFAura:
     def get_custom_controllers(self):
         pass
 
-    
+    def update_scope_from_cache(self, fwuid: str, endpoint: str):
+        """
+        Updates scope with results retrieved from cache 
+        @param: fwuid str
+        @param: endpoint str
+        """
+        self.fwuid = fwuid
+        self.context = self.build_context(self.fwuid)
+        self.endpoint = endpoint
+
      
