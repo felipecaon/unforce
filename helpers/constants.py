@@ -13,3 +13,7 @@ USER_AGENT  = random.choice([
     ])
 
 AURA_ENDPOINTS = ['/s/sfsites/aura','/aura','/s/aura']
+
+BASE_FOLDER_NAME = "results"
+REQUESTS_FOLDER_NAME = "requests"
+RESPONSE_FOLDER_NAME = "response"
