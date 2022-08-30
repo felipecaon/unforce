@@ -19,7 +19,7 @@ def exploit():
     if not options.url:
         sys.exit("URL is required")
 
-    target = "https://shop.latch.com/"
+    target = options.url
 
     folder = create_folder_structure(target)
     cache = check_cache(path=folder, url=target)
