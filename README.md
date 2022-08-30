@@ -28,13 +28,15 @@ Every call made by unforce is properly logged inside a snake-case named folder, 
 Output structure looks like this:
 
 ```
-example_com_results/
-  objects.txt
-  csp_sites.txt
-  requests/
-    User_object.txt
-  response/
-    User_object.txt
+results/
+  target_url/
+    objects.txt
+    interesting_objects.txt    
+    csp_sites.txt
+      requests/
+        User_object.txt
+      response/
+        User_object.txt
 ```
 
 # Cache control
