@@ -3,14 +3,13 @@ import optparse
 
 from classes.SFAura import SFAura
 
-from helpers.utils import create_folder_structure
+from helpers.utils import create_folder_structure, normalize_url
 from helpers.cache import check_cache
 
 def menu():
     parser = optparse.OptionParser()
     parser.add_option('-u', '--url', dest="url", help='Target URL')
     parser.add_option('-r', '--record', dest="record", help='ID of the record needed')
-    parser.add_option('-do', '--dump-objects', dest="dumpobjects", default=False, help='Downloads found objects data (requests and responses)')
 
     options, args = parser.parse_args()
     globals().update(locals())
@@ -19,7 +18,7 @@ def exploit():
     if not options.url:
         sys.exit("URL is required")
 
-    target = options.url
+    target = normalize_url(options.url)
 
     folder = create_folder_structure(target)
     cache = check_cache(path=folder, url=target)
@@ -46,8 +45,7 @@ def exploit():
 
     objects = url.get_objects(config_data)
 
-    if options.dumpobjects:
-        url.get_objects_items(objects)
+    url.get_objects_items(objects)
 
 menu()
 exploit()

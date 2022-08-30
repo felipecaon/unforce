@@ -60,3 +60,12 @@ def save_response(filename: str, path: str, data: any):
     f = open(f'{path}/{RESPONSE_FOLDER_NAME}/{filename}.txt', "a")
     f.write(data)
     f.close()
+
+def normalize_url(url: str):
+    """
+    Normalizes url with the program expected input
+    @param: url str
+    """   
+
+    # Removes the last /
+    return re.sub(r'\/$', '', url)

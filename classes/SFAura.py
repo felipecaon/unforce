@@ -98,6 +98,13 @@ class SFAura:
             post_data = f'message={message}&aura.context={self.context}&aura.token={self.token}'
             response = make_post_request(url=self.url, path=self.endpoint, headers=self.header, data=post_data, save_as=f'{item}_object', path_to_save=self.folder).json()
             save_response(path=self.folder, filename=f'{item}_object', data=str(response))
+            
+            if response['actions'][0]['state'] == 'SUCCESS':
+                number_of_items = len(response['actions'][0]['returnValue']['result'])
+                if number_of_items > 0:
+                    save_data(path=self.folder, filename="interesting_objects", data=f'{item}:{number_of_items} \n')
+            else:
+                pass
 
     @staticmethod
     def build_object_item_message(item: str) -> object:
