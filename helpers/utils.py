@@ -17,7 +17,7 @@ def format_url_to_snake_case(url: str) -> str:
     @param: url str
     @return: snake case str
     """
-    return remove_http_schema(url).replace(".", "_")
+    return remove_http_schema(url).replace(".", "_").replace("/", "_")
 
 def create_folder_structure(target: str) -> str:
     """
@@ -26,8 +26,11 @@ def create_folder_structure(target: str) -> str:
     @return: base folder str
     """
 
+    if not os.path.isdir(BASE_FOLDER_NAME):
+        os.mkdir(BASE_FOLDER_NAME)
+
     snake_case_target = format_url_to_snake_case(target)
-    target_folder_name = f'{snake_case_target}_{BASE_FOLDER_NAME}'
+    target_folder_name = f'{BASE_FOLDER_NAME}/{snake_case_target}'
 
     if not os.path.isdir(target_folder_name):
         os.mkdir(target_folder_name)

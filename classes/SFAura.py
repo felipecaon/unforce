@@ -1,13 +1,13 @@
 import re
 import json
 
-from helpers.constants import USER_AGENT, AURA_ENDPOINTS, BASE_FOLDER_NAME
+from helpers.constants import USER_AGENT, AURA_ENDPOINTS
 from helpers.downloader import make_post_request
 from helpers.utils import save_data, format_url_to_snake_case, save_response
 from helpers.cache import save_cache
 
 class SFAura:
-    def __init__(self, url):
+    def __init__(self, url, folder):
         self.url = url
         self.endpoint = ""
         self.context = ""
@@ -15,7 +15,7 @@ class SFAura:
         self.context = ""
         self.token = "unforcerocks"
 
-        self.folder = f'{format_url_to_snake_case(url)}_{BASE_FOLDER_NAME}'
+        self.folder = folder
         self.header = {'User-Agent':f'{USER_AGENT}', 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'}
 
     def is_salesforce_aura(self) -> bool:
@@ -108,10 +108,19 @@ class SFAura:
         """
         return json.dumps({"actions":[{"id":"123;a","descriptor":"serviceComponent://ui.force.components.controllers.lists.selectableListDataProvider.SelectableListDataProviderController/ACTION$getItems","callingDescriptor":"UNKNOWN","params":{"entityNameOrId":item,"layoutType":"FULL","pageSize":100,"currentPage":0,"useTimeout":False,"getCount":False,"enableRowActions":False}}]})
     
-    def get_item_record(self, objects: object):
-        for obj in objects:
-            message = json.dumps({"actions":[{"id":"123;a","descriptor":"serviceComponent://ui.force.components.controllers.detail.DetailController/ACTION$getRecord","callingDescriptor":"UNKNOWN","params":{"recordId":"0DB3k0000005W3eGAE","record":null,"inContextOfComponent":"","mode":"VIEW","layoutType":"FULL","defaultFieldValues":null,"navigationLocation":"LIST_VIEW_ROW"}}]})
-        pass
+    def get_item_record(self, record_id: str):
+        """
+        Retirves information about a record
+        @param: record_id str
+        """
+
+        if "," in record_id:
+            sys.exit("The provided record ID is invalid")
+
+        message = json.dumps({"actions":[{"id":"123;a","descriptor":"serviceComponent://ui.force.components.controllers.detail.DetailController/ACTION$getRecord","callingDescriptor":"UNKNOWN","params":{"recordId": record_id,"record":null,"inContextOfComponent":"","mode":"VIEW","layoutType":"FULL","defaultFieldValues":null,"navigationLocation":"LIST_VIEW_ROW"}}]})
+        post_data = f'message={message}&aura.context={self.context}&aura.token={self.token}'
+        response = make_post_request(url=self.url, path=self.endpoint, headers=self.header, data=post_data, save_as=f'{record_id}_record', path_to_save=self.folder).json()
+        save_response(path=self.folder, filename=f'{record_id}_record', data=str(response))
 
     def get_custom_controllers(self):
         pass

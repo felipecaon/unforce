@@ -24,6 +24,7 @@ def save_cache(path: str, url: str, fwuid: str, endpoint: str):
     @param: fwuid str
     @param: endpoint str
     """
+    print(path)
     file_name = f'{path}/.unforce'
     if not exists(file_name):
         data = {}

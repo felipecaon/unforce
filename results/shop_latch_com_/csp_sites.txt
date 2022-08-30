@@ -1,0 +1,7 @@
+https://latch.litmos.com
+https://latchpartner.saleshood.com
+https://shop.latch.com
+https://*.clmfed.docusign.com
+https://*.clm.docusign.mil
+https://api.mixpanel.com
+https://*.springcm.com
